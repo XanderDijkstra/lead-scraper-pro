@@ -11,13 +11,14 @@ export async function GET() {
     });
     
     // Group by province
-    const byProvince = places.reduce((acc, place) => {
+    type Place = typeof places[number];
+    const byProvince = places.reduce((acc: Record<string, Place[]>, place: Place) => {
       if (!acc[place.province]) {
         acc[place.province] = [];
       }
       acc[place.province].push(place);
       return acc;
-    }, {} as Record<string, typeof places>);
+    }, {});
     
     return NextResponse.json({ places, byProvince });
   } catch (error) {
