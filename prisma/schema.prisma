@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id              String   @id @default(uuid())
+  source          String   // google_maps, website, manual
+  status          String   @default("new") // new, enriched, contacted, qualified, converted
+  
+  // Basic Info
+  companyName     String
+  slug            String   @unique
+  
+  // Location
+  city            String
+  province        String
+  postalCode      String?
+  street          String?
+  fullAddress     String?
+  
+  // Contact
+  phone           String?
+  email           String?
+  website         String?
+  
+  // Google Maps Data
+  googleMapsUrl   String?
+  googleRating    Float?
+  reviewCount     Int?
+  placeId         String?
+  
+  // Enrichment Data
+  kvkNumber       String?
+  btwNumber       String?
+  yearEstablished Int?
+  employeeCount   String?
+  
+  // Scraped Website Data
+  services        String[] @default([])
+  hasPortfolio    Boolean  @default(false)
+  hasReviews      Boolean  @default(false)
+  technologies    String[] @default([])
+  
+  // Social Media
+  facebookUrl     String?
+  instagramUrl    String?
+  linkedinUrl     String?
+  
+  // Metadata
+  scrapedAt       DateTime @default(now())
+  enrichedAt      DateTime?
+  lastCheckedAt   DateTime?
+  
+  // Relations
+  scrapes         ScrapeRun[]
+  notes           Note[]
+  tags            Tag[]
+  
+  @@index([city])
+  @@index([status])
+  @@index([source])
+}
+
+model ScrapeRun {
+  id          String   @id @default(uuid())
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  // Search Parameters
+  city        String
+  businessType String
+  radius      Int      @default(10)
+  
+  // Results
+  leadsFound    Int @default(0)
+  leadsEnriched Int @default(0)
+  errors        Json?
+  
+  // Relations
+  leads       Lead[]
+}
+
+model DutchPlace {
+  id           String @id @default(uuid())
+  name         String
+  slug         String @unique
+  type         String // city, town, village
+  province     String
+  municipality String
+  population   Int?
+  lat          Float?
+  lng          Float?
+  
+  @@index([province])
+  @@index([municipality])
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  name  String @unique
+  leads Lead[]
+}
