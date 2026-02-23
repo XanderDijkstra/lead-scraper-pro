@@ -10,15 +10,14 @@ export async function GET() {
       ],
     });
     
-    // Group by province
-    type Place = typeof places[number];
-    const byProvince = places.reduce((acc: Record<string, Place[]>, place: Place) => {
-      if (!acc[place.province]) {
-        acc[place.province] = [];
+    // Group by province - explicit types for TypeScript strict mode
+    const byProvince: Record<string, typeof places> = {};
+    for (const place of places) {
+      if (!byProvince[place.province]) {
+        byProvince[place.province] = [];
       }
-      acc[place.province].push(place);
-      return acc;
-    }, {});
+      byProvince[place.province].push(place);
+    }
     
     return NextResponse.json({ places, byProvince });
   } catch (error) {
