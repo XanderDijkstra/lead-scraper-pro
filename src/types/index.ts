@@ -63,7 +63,7 @@ export interface ScrapeRun {
   radius: number;
   leadsFound: number;
   leadsEnriched: number;
-  errors?: any;
+  errors?: Record<string, unknown>;
 }
 
 export interface DutchPlace {

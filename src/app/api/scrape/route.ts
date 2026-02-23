@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { city, businessType, radius = 10, limit = 50 } = body;
+    const { city, businessType, radius = 10 } = body;
     
     if (!city || !businessType) {
       return NextResponse.json(

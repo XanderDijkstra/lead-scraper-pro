@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const source = searchParams.get('source');
     const search = searchParams.get('search');
     
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     
     if (city) where.city = city;
     if (status) where.status = status;
